@@ -21,6 +21,20 @@ async function run() {
     if (cardJson) {
       try {
         payload.cardsV2 = JSON.parse(cardJson)
+
+        for (const card of payload.cardsV2) {
+          if (card.sections) {
+            for (const section of card.sections) {
+              if (section.widgets) {
+                for (const widget of section.widgets) {
+                  if (widget.textParagraph) {
+                    widget.textParagraph.text = formatter.formatMarkdown(widget.textParagraph.text)
+                  }
+                }
+              }
+            }
+          }
+        }
       } catch (error) {
         core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`)
       }
