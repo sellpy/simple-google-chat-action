@@ -1,21 +1,43 @@
 # .github/workflows/example.yml
-name: Example Workflow
-
+name: Publish release to google chat
 on:
-  push:
-    branches: [ main ]
+  release:
+    types: [published]
 
 jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
-
-      - name: 🏗 Setup repo
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.sha || github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
+          fetch-depth: 0  # Fetch all history to get release information
+      
+      - name: Get latest GitHub release
+        id: get-release
+        run: |
+          # Fetch the latest release information and store it in a file
+          gh release view $(gh release list --order desc --limit 1 --json tagName --jq '.[0].tagName') --json tagName,name,body --jq '.' > release-info.json
+          
+          # Extract and set the release information as outputs
+          TAG_NAME=$(jq -r '.tagName' release-info.json)
+          RELEASE_NAME=$(jq -r '.name' release-info.json)
+          RELEASE_BODY=$(jq -r '.body' release-info.json)
+          
+          # Set output variables for the next step
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "release_name=$RELEASE_NAME" >> $GITHUB_OUTPUT
+          
+          # Format the release body for GitHub Actions
+          {
+            echo 'release_body<<EOF'
+            echo "$RELEASE_BODY"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
      
       - name: Send Google Chat notification
         uses: sellpy/simple-google-chat-action@main
@@ -26,8 +48,8 @@ jobs:
             [
               {
                 "header": {
-                  "title": "New Commit",
-                  "subtitle": "Repository: ${{ github.repository }}"
+                  "title": "New Commit: ${{ steps.get-release.outputs.release_name }}",
+                  "subtitle": "Repository: ${{ github.repository }} - Tag: ${{ steps.get-release.outputs.tag_name }}"
                 },
                 "sections": [
                   {
@@ -39,6 +61,16 @@ jobs:
                         }
                       },
                       {
+                        "textParagraph": {
+                          "text": "?? <b>Release Notes:</b>"
+                        }
+                      },
+                      {
+                        "textParagraph": {
+                          "text": "${{ steps.get-release.outputs.release_body }}"
+                        }
+                      },
+                      {
                         "buttons": [
                           {
                             "textButton": {
@@ -46,6 +78,16 @@ jobs:
                               "onClick": {
                                 "openLink": {
                                   "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "textButton": {
+                              "text": "View Release",
+                              "onClick": {
+                                "openLink": {
+                                  "url": "https://github.com/${{ github.repository }}/releases/tag/${{ steps.get-release.outputs.tag_name }}"
                                 }
                               }
                             }
