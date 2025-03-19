@@ -9,6 +9,14 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
+
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.sha || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+     
       - name: Send Google Chat notification
         uses: sellpy/simple-google-chat-action@main
         with:

@@ -18754,21 +18754,11 @@ var require_core = __commonJS((exports) => {
 });
 
 // src/index.ts
-var getInput = function(name, required) {
-  if (process.env.GITHUB_ACTIONS === "true") {
-    return core.getInput(name, { required });
-  }
-  const value = process.env[name.replace(/ /g, "_").toUpperCase()];
-  if (required && !value) {
-    throw new Error(`Input required and not supplied: ${name}`);
-  }
-  return value || null;
-};
 async function run() {
   try {
-    const webhookUrl = getInput("webhook_url", true);
-    const message = getInput("message", false);
-    const cardJson = getInput("card_json", false);
+    const webhookUrl = core.getInput("webhook_url", { required: true });
+    const message = core.getInput("message", { required: false });
+    const cardJson = core.getInput("card_json", { required: false });
     const payload = {};
     if (message) {
       payload.text = message;
