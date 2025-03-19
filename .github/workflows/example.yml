@@ -41,7 +41,7 @@ jobs:
                       },
                       {
                         "buttonList": {
-                          "buttons"": [
+                          "buttons": [
                           {
                               "text": "View Release in Github",
                               "onClick": {
