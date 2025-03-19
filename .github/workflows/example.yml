@@ -21,7 +21,7 @@ jobs:
             [
               {
                 "header": {
-                  "title": "🥳 New App Release 🥳" 
+                  "title": "🥳 New App Release 🥳",
                   "subtitle": "🏷️ Version: ${{ github.event.release.tag_name }}"
                 },
                 "sections": [
