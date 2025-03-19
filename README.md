@@ -1,16 +1,13 @@
 # simple-google-chat-action
 
+### Testing
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
+To test the action you can use `act`
 
 ```bash
-bun run index.ts
+brew install act
+
+act
 ```
 
-This project was created using `bun init` in bun v1.0.25. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+
