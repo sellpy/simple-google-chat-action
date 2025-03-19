@@ -18788,6 +18788,11 @@ var require_core = __commonJS((exports) => {
 // src/formatter.ts
 var exports_formatter = {};
 __export(exports_formatter, {
+  formatTextInCard: () => {
+    {
+      return formatTextInCard;
+    }
+  },
   formatMarkdown: () => {
     {
       return formatMarkdown;
@@ -18798,6 +18803,23 @@ function formatMarkdown(markdown) {
   markdown = markdown.replace(/^#{1,4}\s+(.*)/gm, "<b>$1</b>");
   markdown = markdown.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
   return markdown;
+}
+function formatTextInCard(cardsV2) {
+  const clone = JSON.parse(JSON.stringify(cardsV2));
+  for (const { card } of clone) {
+    if (card.sections) {
+      for (const section of card.sections) {
+        if (section.widgets) {
+          for (const widget of section.widgets) {
+            if (widget.textParagraph) {
+              widget.textParagraph.text = formatMarkdown(widget.textParagraph.text);
+            }
+          }
+        }
+      }
+    }
+  }
+  return clone;
 }
 var init_formatter = __esm(() => {
 });
@@ -18815,19 +18837,7 @@ async function run() {
     if (cardJson) {
       try {
         payload.cardsV2 = JSON.parse(cardJson);
-        for (const { card } of payload.cardsV2) {
-          if (card.sections) {
-            for (const section of card.sections) {
-              if (section.widgets) {
-                for (const widget of section.widgets) {
-                  if (widget.textParagraph) {
-                    widget.textParagraph.text = formatter.formatMarkdown(widget.textParagraph.text);
-                  }
-                }
-              }
-            }
-          }
-        }
+        payload.cardsV2 = formatter.formatTextInCard(payload.cardsV2);
       } catch (error) {
         core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`);
       }
