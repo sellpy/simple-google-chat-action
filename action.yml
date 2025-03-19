@@ -1,0 +1,22 @@
+name: 'Simple Google Chat Notification'
+description: 'Send notifications to Google Chat using webhooks'
+author: 'Sellpy Engineering'
+
+inputs:
+  webhook_url:
+    description: 'The webhook URL for the Google Chat room'
+    required: true
+  message:
+    description: 'The message to send'
+    required: true
+  card_json:
+    description: 'Optional card JSON to include rich formatting'
+    required: false
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: 'message-square'
+  color: 'blue'

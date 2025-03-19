@@ -1,0 +1,51 @@
+# .github/workflows/example.yml
+name: Example Workflow
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Google Chat notification
+        uses: sellpy/simple-google-chat-action@main
+        with:
+          webhook_url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
+          message: "New commit pushed to main branch!"
+          card_json: |
+            [
+              {
+                "header": {
+                  "title": "New Commit",
+                  "subtitle": "Repository: ${{ github.repository }}"
+                },
+                "sections": [
+                  {
+                    "widgets": [
+                      {
+                        "keyValue": {
+                          "topLabel": "Commit",
+                          "content": "${{ github.sha }}"
+                        }
+                      },
+                      {
+                        "buttons": [
+                          {
+                            "textButton": {
+                              "text": "View Commit",
+                              "onClick": {
+                                "openLink": {
+                                  "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
