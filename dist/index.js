@@ -1,20 +1,4 @@
 import {createRequire} from "node:module";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getProtoOf = Object.getPrototypeOf;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __toESM = (mod, isNodeMode, target) => {
-  target = mod != null ? __create(__getProtoOf(mod)) : {};
-  const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
-  for (let key of __getOwnPropNames(mod))
-    if (!__hasOwnProp.call(to, key))
-      __defProp(to, key, {
-        get: () => mod[key],
-        enumerable: true
-      });
-  return to;
-};
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 var __require = createRequire(import.meta.url);
 
@@ -18770,8 +18754,7 @@ var require_core = __commonJS((exports) => {
 });
 
 // src/index.ts
-var core = __toESM(require_core(), 1);
-var getInput2 = function(name, required) {
+var getInput = function(name, required) {
   if (process.env.GITHUB_ACTIONS === "true") {
     return core.getInput(name, { required });
   }
@@ -18781,34 +18764,38 @@ var getInput2 = function(name, required) {
   }
   return value || null;
 };
-try {
-  const webhookUrl = getInput2("webhook_url", true);
-  const message = getInput2("message", false);
-  const cardJson = getInput2("card_json", false);
-  const payload = {};
-  if (message) {
-    payload.text = message;
-  }
-  if (cardJson) {
-    try {
-      payload.cards = JSON.parse(cardJson);
-    } catch (error) {
-      core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`);
+async function run() {
+  try {
+    const webhookUrl = getInput("webhook_url", true);
+    const message = getInput("message", false);
+    const cardJson = getInput("card_json", false);
+    const payload = {};
+    if (message) {
+      payload.text = message;
     }
+    if (cardJson) {
+      try {
+        payload.cards = JSON.parse(cardJson);
+      } catch (error) {
+        core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    core.info("Sending message to Google Chat...");
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
+    }
+    const responseData = await response.json();
+    core.info(`Message sent successfully: ${JSON.stringify(responseData)}`);
+  } catch (error) {
+    core.setFailed(`Action failed: ${error instanceof Error ? error.message : String(error)}`);
   }
-  core.info("Sending message to Google Chat...");
-  const response = await fetch(webhookUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
-  if (!response.ok) {
-    throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
-  }
-  const responseData = await response.json();
-  core.info(`Message sent successfully: ${JSON.stringify(responseData)}`);
-} catch (error) {
-  core.setFailed(`Action failed: ${error instanceof Error ? error.message : String(error)}`);
 }
+var core = require_core();
+run();

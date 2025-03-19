@@ -2,6 +2,7 @@
   "name": "google-chat-action",
   "version": "1.0.0",
   "description": "GitHub Action to send messages to Google Chat",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "bun build ./src/index.ts --outdir ./dist --target node",
