@@ -43,26 +43,19 @@ jobs:
         uses: sellpy/simple-google-chat-action@main
         with:
           webhook_url: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
-          message: "New commit pushed to main branch!"
           card_json: |
             [
               {
                 "header": {
-                  "title": "New Commit: ${{ steps.get-release.outputs.release_name }}",
-                  "subtitle": "Repository: ${{ github.repository }} - Tag: ${{ steps.get-release.outputs.tag_name }}"
+                  "title": "🥳 New App Release 🥳",
+                  "subtitle": "🏷️Version: ${{ steps.get-release.outputs.tag_name }}"
                 },
                 "sections": [
                   {
                     "widgets": [
                       {
-                        "keyValue": {
-                          "topLabel": "Commit",
-                          "content": "${{ github.sha }}"
-                        }
-                      },
-                      {
                         "textParagraph": {
-                          "text": "?? <b>Release Notes:</b>"
+                          "text": "<b>Release Notes:</b>"
                         }
                       },
                       {
@@ -74,17 +67,7 @@ jobs:
                         "buttons": [
                           {
                             "textButton": {
-                              "text": "View Commit",
-                              "onClick": {
-                                "openLink": {
-                                  "url": "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-                                }
-                              }
-                            }
-                          },
-                          {
-                            "textButton": {
-                              "text": "View Release",
+                              "text": "View Release in Github",
                               "onClick": {
                                 "openLink": {
                                   "url": "https://github.com/${{ github.repository }}/releases/tag/${{ steps.get-release.outputs.tag_name }}"

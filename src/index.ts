@@ -2,7 +2,7 @@ const core = require('@actions/core')
 
 interface GoogleChatMessage {
   text?: string
-  cards?: any[]
+  cardsV2?: any[]
 }
 
 async function run() {
@@ -19,7 +19,7 @@ async function run() {
 
     if (cardJson) {
       try {
-        payload.cards = JSON.parse(cardJson)
+        payload.cardsV2 = JSON.parse(cardJson)
       } catch (error) {
         core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`)
       }
