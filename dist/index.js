@@ -1,37 +1,21 @@
 import {createRequire} from "node:module";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
+var __getProtoOf = Object.getPrototypeOf;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __toCommonJS = (from) => {
-  const moduleCache = __toCommonJS.moduleCache ??= new WeakMap;
-  var cached = moduleCache.get(from);
-  if (cached)
-    return cached;
-  var to = __defProp({}, "__esModule", { value: true });
-  var desc = { enumerable: false };
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key))
-        __defProp(to, key, {
-          get: () => from[key],
-          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
-        });
-  }
-  moduleCache.set(from, to);
+var __toESM = (mod, isNodeMode, target) => {
+  target = mod != null ? __create(__getProtoOf(mod)) : {};
+  const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
+  for (let key of __getOwnPropNames(mod))
+    if (!__hasOwnProp.call(to, key))
+      __defProp(to, key, {
+        get: () => mod[key],
+        enumerable: true
+      });
   return to;
 };
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, {
-      get: all[name],
-      enumerable: true,
-      configurable: true,
-      set: (newValue) => all[name] = () => newValue
-    });
-};
-var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 var __require = createRequire(import.meta.url);
 
 // node_modules/@actions/core/lib/utils.js
@@ -18785,20 +18769,10 @@ var require_core = __commonJS((exports) => {
   exports.platform = __importStar(require_platform());
 });
 
+// src/index.ts
+var core = __toESM(require_core(), 1);
+
 // src/formatter.ts
-var exports_formatter = {};
-__export(exports_formatter, {
-  formatTextInCard: () => {
-    {
-      return formatTextInCard;
-    }
-  },
-  formatMarkdown: () => {
-    {
-      return formatMarkdown;
-    }
-  }
-});
 function formatMarkdown(markdown) {
   markdown = markdown.replace(/^#{1,4}\s+(.*)/gm, "<b>$1</b>");
   markdown = markdown.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
@@ -18821,8 +18795,6 @@ function formatTextInCard(cardsV2) {
   }
   return clone;
 }
-var init_formatter = __esm(() => {
-});
 
 // src/index.ts
 async function run() {
@@ -18837,7 +18809,7 @@ async function run() {
     if (cardJson) {
       try {
         payload.cardsV2 = JSON.parse(cardJson);
-        payload.cardsV2 = formatter.formatTextInCard(payload.cardsV2);
+        payload.cardsV2 = formatTextInCard(payload.cardsV2);
       } catch (error) {
         core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -18859,6 +18831,4 @@ async function run() {
     core.setFailed(`Action failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
-var core = require_core();
-var formatter = (init_formatter(), __toCommonJS(exports_formatter));
 run();

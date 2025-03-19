@@ -1,5 +1,5 @@
-const core = require('@actions/core')
-const formatter = require('./formatter')
+import * as core from '@actions/core'
+import * as formatter from './formatter'
 
 interface GoogleChatMessage {
   text?: string
