@@ -22,7 +22,7 @@ async function run() {
       try {
         payload.cardsV2 = JSON.parse(cardJson)
 
-        for (const card of payload.cardsV2) {
+        for (const { card } of payload.cardsV2!) {
           if (card.sections) {
             for (const section of card.sections) {
               if (section.widgets) {
