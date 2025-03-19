@@ -34,7 +34,7 @@ jobs:
                       },
                       {
                         "textParagraph": {
-                          "text": "${{ toJSON(github.event.release.body) }}"
+                          "text": ${{ toJSON(github.event.release.body) }}
                         }
                       },
                       {
