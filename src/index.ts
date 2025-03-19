@@ -1,4 +1,5 @@
 const core = require('@actions/core')
+const { formatter } = require('./formatter')
 
 interface GoogleChatMessage {
   text?: string
