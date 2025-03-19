@@ -3,7 +3,6 @@ name: Publish release to google chat
 on:
   release:
     types: [published]
-
 jobs:
   notify:
     runs-on: ubuntu-latest
@@ -11,34 +10,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.sha || github.sha }}
+          ref: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Fetch all history to get release information
       
-      - name: Get latest GitHub release
-        id: get-release
-        run: |
-          # Fetch the latest release information and store it in a file
-          gh release view $(gh release list --order desc --limit 1 --json tagName --jq '.[0].tagName') --json tagName,name,body --jq '.' > release-info.json
-          
-          # Extract and set the release information as outputs
-          TAG_NAME=$(jq -r '.tagName' release-info.json)
-          RELEASE_NAME=$(jq -r '.name' release-info.json)
-          RELEASE_BODY=$(jq -r '.body' release-info.json)
-          
-          # Set output variables for the next step
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "release_name=$RELEASE_NAME" >> $GITHUB_OUTPUT
-          
-          # Format the release body for GitHub Actions
-          {
-            echo 'release_body<<EOF'
-            echo "$RELEASE_BODY"
-            echo 'EOF'
-          } >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-     
       - name: Send Google Chat notification
         uses: sellpy/simple-google-chat-action@main
         with:
@@ -47,8 +21,8 @@ jobs:
             [
               {
                 "header": {
-                  "title": "🥳 New App Release 🥳",
-                  "subtitle": "🏷️Version: ${{ steps.get-release.outputs.tag_name }}"
+                  "title": "?? New App Release ??",
+                  "subtitle": "?? Version: ${{ github.event.release.tag_name }}"
                 },
                 "sections": [
                   {
@@ -60,7 +34,7 @@ jobs:
                       },
                       {
                         "textParagraph": {
-                          "text": "${{ steps.get-release.outputs.release_body }}"
+                          "text": "${{ toJSON(github.event.release.body) }}"
                         }
                       },
                       {
@@ -70,7 +44,7 @@ jobs:
                               "text": "View Release in Github",
                               "onClick": {
                                 "openLink": {
-                                  "url": "https://github.com/${{ github.repository }}/releases/tag/${{ steps.get-release.outputs.tag_name }}"
+                                  "url": "https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}"
                                 }
                               }
                             }
