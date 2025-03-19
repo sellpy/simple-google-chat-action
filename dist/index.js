@@ -18771,37 +18771,44 @@ var require_core = __commonJS((exports) => {
 
 // src/index.ts
 var core = __toESM(require_core(), 1);
-async function run() {
-  try {
-    const webhookUrl = core.getInput("webhook_url", { required: true });
-    const message = core.getInput("message", { required: true });
-    const cardJson = core.getInput("card_json");
-    const payload = {};
-    if (message) {
-      payload.text = message;
-    }
-    if (cardJson) {
-      try {
-        payload.cards = JSON.parse(cardJson);
-      } catch (error) {
-        core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
-    core.info("Sending message to Google Chat...");
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
-    }
-    const responseData = await response.json();
-    core.info(`Message sent successfully: ${JSON.stringify(responseData)}`);
-  } catch (error) {
-    core.setFailed(`Action failed: ${error instanceof Error ? error.message : String(error)}`);
+var getInput2 = function(name, required) {
+  if (process.env.GITHUB_ACTIONS === "true") {
+    return core.getInput(name, { required });
   }
+  const value = process.env[name.replace(/ /g, "_").toUpperCase()];
+  if (required && !value) {
+    throw new Error(`Input required and not supplied: ${name}`);
+  }
+  return value || null;
+};
+try {
+  const webhookUrl = getInput2("webhook_url", true);
+  const message = getInput2("message", false);
+  const cardJson = getInput2("card_json", false);
+  const payload = {};
+  if (message) {
+    payload.text = message;
+  }
+  if (cardJson) {
+    try {
+      payload.cards = JSON.parse(cardJson);
+    } catch (error) {
+      core.warning(`Failed to parse card JSON: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  core.info("Sending message to Google Chat...");
+  const response = await fetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to send message: ${response.status} ${response.statusText}`);
+  }
+  const responseData = await response.json();
+  core.info(`Message sent successfully: ${JSON.stringify(responseData)}`);
+} catch (error) {
+  core.setFailed(`Action failed: ${error instanceof Error ? error.message : String(error)}`);
 }
-run();
