@@ -18860,5 +18860,5 @@ async function run() {
   }
 }
 var core = require_core();
-var { formatter } = (init_formatter(), __toCommonJS(exports_formatter));
+var formatter = (init_formatter(), __toCommonJS(exports_formatter));
 run();
