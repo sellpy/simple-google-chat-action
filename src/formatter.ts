@@ -1,7 +1,10 @@
 export function formatMarkdown(markdown: string): string {
+  if (markdown.startsWith('"') && markdown.endsWith('"')) {
+    markdown = markdown.slice(1, -1)
+  }
   markdown = markdown.replace(/^#{1,4}\s+(.*)/gm, '<b>$1</b>')
   markdown = markdown.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-  markdown = markdown.replace(/\\n/g, '<br>')
+  markdown = markdown.replace(/\n|\n/g, '<br>')
   return markdown
 }
 
