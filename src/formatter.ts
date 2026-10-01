@@ -1,11 +1,19 @@
+const HEADING = /^#{1,4}\s+(.*)/gm
+const BOLD = /\*\*(.*?)\*\*/g
+const MARKDOWN_LINK = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g
+const BARE_LINK = /(^|[^"'\w>])(https?:\/\/[^\s<"']*[^\s<"'\.,;:!?)])/g
+const NEWLINE = /\r?\n/g
+
 export function formatMarkdown(markdown: string): string {
   if (markdown.startsWith('"') && markdown.endsWith('"')) {
     markdown = markdown.slice(1, -1)
   }
-  markdown = markdown.replace(/^#{1,4}\s+(.*)/gm, '<b>$1</b>')
-  markdown = markdown.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-  markdown = markdown.replace(/\n|\n/g, '<br>')
   return markdown
+    .replace(HEADING, '<b>$1</b>')
+    .replace(BOLD, '<b>$1</b>')
+    .replace(MARKDOWN_LINK, '<a href="$2">$1</a>')
+    .replace(BARE_LINK, '$1<a href="$2">$2</a>')
+    .replace(NEWLINE, '<br>')
 }
 
 export function formatTextInCard<T>(cardsV2: T): T {
